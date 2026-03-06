@@ -9,3 +9,4 @@ class ToDo(Base):
     description=Column(String)
     priority=Column(Integer)
     completed=Column(Boolean , default=False)
+
