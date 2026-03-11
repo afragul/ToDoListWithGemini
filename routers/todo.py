@@ -4,7 +4,7 @@ from typing import Annotated
 from pydantic import BaseModel , Field
 from sqlalchemy.orm import Session
 from starlette import status
-
+from routers.auth import current_user
 from models import Base,ToDo
 from database import engine, SessionLocal
 
@@ -31,10 +31,15 @@ def get_db():
 #tum endpointler bu fonka depend edecek artik
 
 db_dependency= Annotated[Session, Depends(get_db)] #session acilir
+user_dep=Annotated[dict, Depends(current_user)]
+
 
 @router.get("/get_all")
-async def get_all(db:db_dependency):
-    return db.query(ToDo).all()
+async def get_all(user:user_dep, db:db_dependency):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+
+    return db.query(ToDo).filter(ToDo.owner_id==user.get('id')).all()
 
 @router.get("/get_by_id/{id}" , status_code=status.HTTP_200_OK)
 async def get_by_id( db:db_dependency ,id: int=Path(gt=0)):
@@ -45,9 +50,11 @@ async def get_by_id( db:db_dependency ,id: int=Path(gt=0)):
 
 
 
-@router.post("/create",status_code=status.HTTP_201_CREATED)
-async def create_todo(db:db_dependency , todo_request: ToDoRequest):
-    todo=ToDo(**todo_request.dict())
+@router.post("/create_todo",status_code=status.HTTP_201_CREATED)
+async def create_todo(user:user_dep, db:db_dependency , todo_request: ToDoRequest):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    todo=ToDo(**todo_request.dict(),owner_id=user.get('id'))
     db.add(todo)
     db.commit()
 
