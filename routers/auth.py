@@ -40,6 +40,7 @@ class RegisterUserRequest(BaseModel): #register endpointi icin gerekli
     last_name: str
     password: str
     roles: str
+    phone_number: str
 
 class Token(BaseModel):
     access_token: str
@@ -90,7 +91,8 @@ async def register_user(db:db_dependency ,request: RegisterUserRequest):
         last_name=request.last_name,
         roles=request.roles,
         is_active= True,
-        hashed_password=bcrypt_context.hash(request.password)
+        hashed_password=bcrypt_context.hash(request.password),
+        phone_number= request.phone_number
     )
     db.add(user)
     db.commit()

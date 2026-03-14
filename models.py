@@ -22,4 +22,5 @@ class Users(Base):
     hashed_password=Column(String)
     is_active=Column(Boolean , default=True)
     roles=Column(String)
+    phone_number= Column(String)
 
