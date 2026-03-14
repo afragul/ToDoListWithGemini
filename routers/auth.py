@@ -1,8 +1,10 @@
 import os
 from datetime import timedelta , datetime ,timezone
 from typing import Annotated
+from urllib.request import Request
+
 from sqlalchemy.orm import Session
-from fastapi import APIRouter , Depends ,HTTPException
+from fastapi import APIRouter , Depends ,HTTPException ,Request
 from pydantic import BaseModel
 from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm , OAuth2PasswordBearer
@@ -10,6 +12,7 @@ from database import SessionLocal
 from models import Users
 from passlib.context import CryptContext
 from jose import jwt, JWTError
+from fastapi.templating import Jinja2Templates
 
 router= APIRouter(
     prefix= "/auth",
@@ -19,6 +22,8 @@ router= APIRouter(
 #SECRET_KEY = os.getenv("SECRET_KEY") eger daha iyi calismak istersen
 SECRET_KEY = "hyj5dza4my6b17ajfr652zhv3a9jzfcw"  #jwt icin anahtar kelime
 ALGORITHM = "HS256" #jwt icin
+
+templates= Jinja2Templates(directory= "templates")
 
 def get_db():
     db=SessionLocal()
@@ -45,6 +50,16 @@ class RegisterUserRequest(BaseModel): #register endpointi icin gerekli
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+#sayfalar tanimlanacak
+@router.get("/login-page")
+def render_login_page(request: Request): #login page e istek atilinca bu sayfa acilacak
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@router.get("/register-page")
+def render_register_page(request: Request): #register page e istek atilinca bu sayfa acilacak
+    return templates.TemplateResponse("register.html", {"request": request})
 
 
 
@@ -78,8 +93,6 @@ async def current_user(token: Annotated[str , Depends(oauth2_bearer)]):
         return {'username': username, 'id': user_id, 'roles': roles}
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token")
-
-
 
 
 @router.post("/register" , status_code=status.HTTP_201_CREATED)
