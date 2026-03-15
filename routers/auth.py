@@ -110,7 +110,7 @@ async def register_user(db:db_dependency ,request: RegisterUserRequest):
     db.add(user)
     db.commit()
 
-@router.post("/login" , response_model=Token)
+@router.post("/token" , response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()] ,
                                  db: db_dependency ): #bu form direkt alindi biz olusturmadik
     user= authenticate_user(form_data.username , form_data.password , db)
@@ -119,24 +119,6 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
 
     token= create_access_token(user.username, user.id, user.roles, timedelta(minutes=60))
     return {"access_token": token, "token_type": "bearer"}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

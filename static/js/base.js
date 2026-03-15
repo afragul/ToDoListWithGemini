@@ -12,7 +12,7 @@
                 title: data.title,
                 description: data.description,
                 priority: parseInt(data.priority),
-                complete: false
+                completed: false
             };
 
             try {
@@ -30,7 +30,7 @@
                 } else {
                     // Handle error
                     const errorData = await response.json();
-                    alert(`Error: ${errorData.detail}`);
+                    alert(JSON.stringify(errorData));
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -54,7 +54,7 @@
             title: data.title,
             description: data.description,
             priority: parseInt(data.priority),
-            complete: data.complete === "on"
+            completed:data.complete === "on"
         };
 
         try {
