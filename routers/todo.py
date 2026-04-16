@@ -7,8 +7,8 @@ from starlette import status
 from starlette.responses import RedirectResponse
 
 from routers.auth import current_user
-from models import Base,ToDo
-from database import engine, SessionLocal
+from ..models import Base,ToDo
+from ..database import engine, SessionLocal
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -25,7 +25,7 @@ router=APIRouter(
 
 #burda sadece to-do ile alakali seyler olmali. req, kendi endpointleri vs vs
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/templates")
 
 class ToDoRequest(BaseModel):
     title: str =Field(min_length=3)
